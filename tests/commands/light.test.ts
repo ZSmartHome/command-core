@@ -1,8 +1,8 @@
 import {light} from "../../src/index";
 
-test("Testing 'light' execution", () => {
+test(`Testing 'light' execution`, () => {
 
-  light('off');
-  light('on');
+  light(`off`);
+  light(`on`);
 
 });
