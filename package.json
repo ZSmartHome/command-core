@@ -1,10 +1,11 @@
 {
   "name": "@ZSmartHome/command-core",
-  "version": "0.9.0",
+  "version": "0.0.1",
   "description": "Common Library for smart devices",
   "main": "./build/index.js",
   "files": [
-    "./build"
+    "./build",
+    "./types"
   ],
   "scripts": {
     "build": "tsc",
@@ -27,7 +28,10 @@
   },
   "homepage": "https://github.com/ZSmartHome/command-core#readme",
   "devDependencies": {
-    "tslint": "6.1.2",
+    "tslint": "6.1.2"
+  },
+  "dependencies": {
+    "@types/node": "14.0.24",
     "typescript": "3.9.7"
   }
 }
