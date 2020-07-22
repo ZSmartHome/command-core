@@ -10,7 +10,7 @@
   "scripts": {
     "build": "tsc",
     "prepare": "npm run build",
-    "lint": "tslint",
+    "lint": "tslint --project .",
     "test": "jest --coverage"
   },
   "repository": {
