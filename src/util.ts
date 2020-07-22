@@ -48,3 +48,6 @@ export const split = (buttons: any[], ...rows: number[]): any[][] => {
   }
   return result;
 };
+
+type Pair<T> = { [s: string]: T } | { [n: number]: T };
+export const each = <T>(o: Pair<T>): [string | number, T][] => Object.entries(o);
