@@ -1,6 +1,6 @@
 {
-  "name": "@ZSmartHome/command-core",
-  "version": "0.2.1",
+  "name": "@zsmarthome/command-core",
+  "version": "0.3.1",
   "description": "Common Library for smart devices",
   "main": "./build/index.js",
   "files": [
