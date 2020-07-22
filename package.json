@@ -5,7 +5,7 @@
   "main": "./build/index.js",
   "files": [
     "./build",
-    "@types"
+    "types"
   ],
   "scripts": {
     "clean": "rm -rf ./build",
