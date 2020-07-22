@@ -1,4 +1,4 @@
-import * as Yeelight from 'yeelight2';
+import {Yeelight} from 'yeelight2';
 import {ExecutionError} from '../errors/execution-error';
 
 interface Option {

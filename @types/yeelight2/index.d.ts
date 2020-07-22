@@ -84,11 +84,10 @@ declare module "yeelight2" {
     }
   }
 
-  class Yeelight {
+  export class Yeelight {
     static discover(callback: (this: Yeelight.Closable, light: Yeelight.Light) => void): void;
 
     static close(): void
   }
 
-  export = Yeelight;
 }
