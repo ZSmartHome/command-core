@@ -1,5 +1,5 @@
-import {Yeelight} from 'yeelight2';
 import {ExecutionError} from '../errors/execution-error';
+import Yeelight from 'yeelight2';
 
 interface Option {
   [command: string]: (light: Yeelight.Light) => Promise<any>;
