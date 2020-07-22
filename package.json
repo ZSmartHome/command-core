@@ -1,0 +1,33 @@
+{
+  "name": "@ZSmartHome/command-core",
+  "version": "0.9.0",
+  "description": "Common Library for smart devices",
+  "main": "./build/index.js",
+  "files": [
+    "./build"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZSmartHome/command-core.git"
+  },
+  "keywords": [
+    "smarthome",
+    "library",
+    "core"
+  ],
+  "author": "Evgenii Shchepotev (@zeckson)",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/ZSmartHome/command-core/issues"
+  },
+  "homepage": "https://github.com/ZSmartHome/command-core#readme",
+  "devDependencies": {
+    "tslint": "6.1.2",
+    "typescript": "3.9.7"
+  }
+}
