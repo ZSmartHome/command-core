@@ -7,5 +7,6 @@
   "timeout": 2000,
   "ui": "bdd",
   "require": "ts-node/register",
-  "watch-files": ["test/**/*.spec.ts"]
+  "watch-files": ["test/**/*.spec.ts"],
+  "watch-ignore": ["test/*.ts"]
 }

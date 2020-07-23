@@ -1,4 +1,4 @@
-import {ExecutionError} from '../errors/execution-error';
+import {ExecutionError} from '..';
 import Yeelight from 'yeelight2';
 
 interface Option {
@@ -44,7 +44,7 @@ const connectLamp = () => new Promise<Yeelight.Light>((success, fail) => {
   });
 });
 
-const Option: Option = {
+export const Option: Option = {
   on: (it) => it.set_power(`on`),
   off: (it) => it.set_power(`off`),
   bright: (it) => it.set_bright(100),
@@ -57,7 +57,9 @@ const Option: Option = {
   default: (it) => reset(it),
 };
 
-export const execute = async (command: string): Promise<string> => {
+export type Value = keyof Option;
+
+export const execute = async (command: Value): Promise<string> => {
   if (!command) {
     throw new ExecutionError(`What should I do with Light?`);
   }
