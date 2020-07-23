@@ -3,21 +3,27 @@ import {ExecutionError} from './errors/execution-error';
 
 export const shell = (command: string): Promise<string> => {
   return new Promise((onSuccess, onFail) => {
-    console.log(`Calling command: ${command}`);
+    console.log(`Calling command: "${command}"`);
     exec(command,
       (error: Error | null, stdout: string, stderr: string) => {
-        console.log(`Command: ${command} complete`, error, stdout, stderr);
+        console.log(`Command: "${command}" finished`);
         if (error) {
-          onFail(new ExecutionError(`exec error: ${error}`));
+          console.log(`Got error: "${error.message}"`);
+          onFail(new ExecutionError(`exec error: ${error.message}`));
           return;
         }
-        let message;
-        if (stdout || stderr) {
-          message = `stdout: ${stdout}\nstderr: ${stderr}`;
-        } else {
-          message = `Command complete`;
+        const result = [`Command complete:`]
+        if (stdout) {
+          const text = `stdout: ${stdout}`;
+          console.log(text);
+          result.push(text);
         }
-        onSuccess(message);
+        if(stderr) {
+          const text = `stderr: ${stdout}`;
+          console.log(text);
+          result.push(text);
+        }
+        onSuccess(result.join(`\n`));
       });
   });
 };

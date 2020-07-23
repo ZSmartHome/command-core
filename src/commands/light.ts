@@ -1,6 +1,6 @@
 import {ExecutionError} from '..';
 import * as Yeelight from 'yeelight2';
-import {Action, Command, execute as executeCommand, Executor, OptionLike} from './option';
+import {Command, ExecuteFunc, Executor, OptionLike, run, toCommands} from './option';
 
 // https://en.wikipedia.org/wiki/Color_temperature
 const TEMPERATURE = {
@@ -42,62 +42,39 @@ const connectLamp = () => new Promise<Yeelight.Light>((success, fail) => {
 });
 
 
-type LightExecutor = Executor<Yeelight.Light>;
-
-class LightAction extends Action<Yeelight.Light> {
-
-  constructor(executor: LightExecutor, private save: boolean) {
-    super(executor);
-  }
-
-  async execute(): Promise<Yeelight.Light> {
-    const lamp = await connectLamp();
-
-    let promise = this.executor(lamp);
-    promise = this.save ? promise.then((it) => it.set_default()) : promise;
-    // TODO: Test finally and move on Node 10 and higher
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/finally
-    // return promise.finally(() => lamp.exit());
-    try {
-      return await promise;
-    } finally {
-      lamp.exit();
-    }
-  }
-
-}
-
-interface Option extends OptionLike<Yeelight.Light> {
+interface Option extends OptionLike<Executor<Yeelight.Light>> {
   doNotSave?: boolean
 }
 
-const toCommands = (raw: { [command: string]: Option }): { [command: string]: Command<Yeelight.Light> } => {
-  const result: { [command: string]: Command<Yeelight.Light> } = {}
-  for (const command of Object.keys(raw)) {
-    const value: Option = raw[command];
-    const executor = value.executor;
-    result[command] = {
-      command,
-      action: new LightAction(executor, !value.doNotSave),
-      label: value.label || command,
-      description: value.description || (value.label || command),
-    };
+const decorate = (executor: Executor<Yeelight.Light>, save = true): ExecuteFunc<Yeelight.Light> => async (): Promise<Yeelight.Light> => {
+  const lamp = await connectLamp();
+
+  let promise = executor(lamp);
+  promise = save ? promise.then((it) => it.set_default()) : promise;
+  // TODO: Test finally and move on Node 10 and higher
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/finally
+  // return promise.finally(() => lamp.exit());
+  try {
+    return await promise;
+  } finally {
+    lamp.exit();
   }
-  return result;
 }
-export const commands: { [command: string]: Command<Yeelight.Light> } = Object.freeze(toCommands({
-  on: {label: `On 💡`, doNotSave: true, executor: (it) => it.set_power(`on`)},
-  off: {label: `Off 💡`, doNotSave: true, executor: (it) => it.set_power(`off`)},
-  bright: {label: `Bright ☀️`, executor: (it) => it.set_bright(75)},
-  normal: {label: `Питер 🌤️`, executor: (it) => it.set_bright(50)},
-  dark: {label: `Dark ☁️`, executor: (it) => it.set_bright(30)},
-  red: {label: `🔴`, executor: (it) => it.set_rgb(0xFF0000)},
-  blue: {label: `🔵`, executor: (it) => it.set_rgb(0x0000FF)},
-  green: {label: `🟢`, executor: (it) => it.set_rgb(0x00FF00)},
-  reset: {label: `Комнатный 💡`, executor: reset}
-}));
+
+
+export const commands: { [command: string]: Command<Yeelight.Light> } = toCommands<Yeelight.Light, Executor<Yeelight.Light>, Option>({
+  on: {label: `On 💡`, doNotSave: true, value: (it) => it.set_power(`on`)},
+  off: {label: `Off 💡`, doNotSave: true, value: (it) => it.set_power(`off`)},
+  bright: {label: `Bright ☀️`, value: (it) => it.set_bright(75)},
+  normal: {label: `Питер 🌤️`, value: (it) => it.set_bright(50)},
+  dark: {label: `Dark ☁️`, value: (it) => it.set_bright(30)},
+  red: {label: `🔴`, value: (it) => it.set_rgb(0xFF0000)},
+  blue: {label: `🔵`, value: (it) => it.set_rgb(0x0000FF)},
+  green: {label: `🟢`, value: (it) => it.set_rgb(0x00FF00)},
+  reset: {label: `Комнатный 💡`, value: reset}
+}, (option) => decorate(option.value, !option.doNotSave));
 
 
 export type CommandKey = keyof typeof commands;
 
-export const execute = async (command: CommandKey): Promise<Yeelight.Light> => executeCommand(`Light`, commands, command);
+export const execute = async (command: CommandKey): Promise<Yeelight.Light> => run(`Light`, commands, command);

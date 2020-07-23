@@ -1,5 +1,5 @@
 import {shell} from '../util';
-import {ExecutionError} from '../errors/execution-error';
+import {Command, OptionLike, run, toCommands} from './option';
 
 /*
 # Switch on
@@ -9,25 +9,18 @@ import {ExecutionError} from '../errors/execution-error';
 # Switch HDMI port to 1
   echo "tx 4F:82:10:00" | cec-client -s
 */
-const TvCommand: { [command: string]: string } = {
-  on: `on 0`,
-  off: `tx 4F:36`,
+const cec = (command: string): Promise<string> =>
+  shell(`echo "${command}" | cec-client -o Raspberry -s -d 1`)
 
-  chromecast: `tx 4F:82:10:00`,
-  raspberry: `tx 4F:82:20:00`,
-  hdmi: `tx 4F:82:30:00`,
-};
+export const commands: { [command: string]: Command<string> } =
+  toCommands<string, string, OptionLike<string>>({
+    on: {label: `On 💡`, value: `on 0`},
+    off: {label: `Off 💡`, value: `standby 0`},
 
-export const execute = async (command: string) => {
-  if (!command) {
-    throw new ExecutionError(`What should I do with TV?`);
-  }
-  const action = TvCommand[command];
-  if (!action) {
-    const message = `Unsupported command: ${command}`;
-    console.error(message);
-    throw new ExecutionError(`Unsupported command: ${command}`);
-  }
+    chromecast: {label: `Chromecast 📽️`, value: `tx 4F:82:10:00`},
+    raspberry: {label: `Raspberry 🖥️`, value: `tx 4F:82:20:00`},
+    hdmi: {label: `HDMi 💻`, value: `tx 4F:82:30:00`},
+  }, (option: OptionLike<string>) => () => cec(option.value));
 
-  return shell(`echo "${action}" | cec-client -o Raspberry -s -d 1`);
-};
+
+export const execute = async (command: string) => run(`TV`, commands, command);
