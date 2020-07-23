@@ -1,6 +1,7 @@
-src
-test
-script
+src/
+test/
+script/
+
 tslint.json
 .editorconfig
 
