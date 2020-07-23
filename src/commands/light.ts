@@ -59,16 +59,9 @@ export const Option: Option = {
 
 export type Value = keyof Option;
 
-// BC! TS doesn't support built-in extending like in spec es6
-class MyString extends String {
-  isEmpty() {
-    return this.trim().length === 0;
-  }
-}
-
 export const execute = async (command: Value): Promise<string> => {
-  const myCommand = (new MyString(String(command).trim()));
-  const isEmpty = myCommand.isEmpty();
+  command = String(command).trim();
+  const isEmpty = command.length === 0;
   if (isEmpty) {
     throw new ExecutionError(`What should I do with Light?`);
   }
