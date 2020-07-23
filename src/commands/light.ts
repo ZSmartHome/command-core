@@ -1,9 +1,6 @@
 import {ExecutionError} from '..';
 import * as Yeelight from 'yeelight2';
-
-interface Option {
-  [command: string]: (light: Yeelight.Light) => Promise<any>;
-}
+import {Action, Command, execute as executeCommand, Executor, OptionLike} from './option';
 
 // https://en.wikipedia.org/wiki/Color_temperature
 const TEMPERATURE = {
@@ -44,36 +41,63 @@ const connectLamp = () => new Promise<Yeelight.Light>((success, fail) => {
   });
 });
 
-export const Option: Option = {
-  on: (it) => it.set_power(`on`),
-  off: (it) => it.set_power(`off`),
-  bright: (it) => it.set_bright(100),
-  normal: (it) => it.set_bright(50),
-  dark: (it) => it.set_bright(25),
-  red: (it) => it.set_rgb(0xFF0000),
-  blue: (it) => it.set_rgb(0x0000FF),
-  green: (it) => it.set_rgb(0x00FF00),
-  white: (it) => it.set_rgb(0xFFFFFF),
-  default: (it) => reset(it),
-};
 
-export type Value = keyof Option;
+type LightExecutor = Executor<Yeelight.Light>;
 
-export const execute = async (command: Value): Promise<string> => {
-  command = String(command).trim();
-  const isEmpty = command.length === 0;
-  if (isEmpty) {
-    throw new ExecutionError(`What should I do with Light?`);
-  }
-  const action = Option[command];
-  if (!action) {
-    throw new ExecutionError(`Unsupported command: ${command}`);
+class LightAction extends Action<Yeelight.Light> {
+
+  constructor(executor: LightExecutor, private save: boolean) {
+    super(executor);
   }
 
-  const lamp = await connectLamp();
+  async execute(): Promise<Yeelight.Light> {
+    const lamp = await connectLamp();
 
-  return action(lamp).then(() => lamp.set_default()).then((it) => {
-    lamp.exit();
-    return it;
-  });
-};
+    let promise = this.executor(lamp);
+    promise = this.save ? promise.then((it) => it.set_default()) : promise;
+    // TODO: Test finally and move on Node 10 and higher
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/finally
+    // return promise.finally(() => lamp.exit());
+    try {
+      return await promise;
+    } finally {
+      lamp.exit();
+    }
+  }
+
+}
+
+interface Option extends OptionLike<Yeelight.Light> {
+  doNotSave?: boolean
+}
+
+const toCommands = (raw: { [command: string]: Option }): { [command: string]: Command<Yeelight.Light> } => {
+  const result: { [command: string]: Command<Yeelight.Light> } = {}
+  for (const command of Object.keys(raw)) {
+    const value: Option = raw[command];
+    const executor = value.executor;
+    result[command] = {
+      command,
+      action: new LightAction(executor, !value.doNotSave),
+      label: value.label || command,
+      description: value.description || (value.label || command),
+    };
+  }
+  return result;
+}
+export const commands: { [command: string]: Command<Yeelight.Light> } = Object.freeze(toCommands({
+  on: {label: `On 💡`, doNotSave: true, executor: (it) => it.set_power(`on`)},
+  off: {label: `Off 💡`, doNotSave: true, executor: (it) => it.set_power(`off`)},
+  bright: {label: `Bright ☀️`, executor: (it) => it.set_bright(75)},
+  normal: {label: `Питер 🌤️`, executor: (it) => it.set_bright(50)},
+  dark: {label: `Dark ☁️`, executor: (it) => it.set_bright(30)},
+  red: {label: `🔴`, executor: (it) => it.set_rgb(0xFF0000)},
+  blue: {label: `🔵`, executor: (it) => it.set_rgb(0x0000FF)},
+  green: {label: `🟢`, executor: (it) => it.set_rgb(0x00FF00)},
+  reset: {label: `Комнатный 💡`, executor: reset}
+}));
+
+
+export type CommandKey = keyof typeof commands;
+
+export const execute = async (command: CommandKey): Promise<Yeelight.Light> => executeCommand(`Light`, commands, command);
