@@ -6,7 +6,7 @@
   "scripts": {
     "clean": "rm -rf ./build",
     "build": "tsc",
-    "prepare": "npm run build",
+    "prepare": "npm run clean && npm run build",
     "lint": "tslint -p . -t verbose",
     "test": "npm run lint && jest -c ./test/jest.config.json"
   },
