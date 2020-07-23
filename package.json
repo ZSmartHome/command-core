@@ -12,7 +12,7 @@
     "build": "tsc",
     "prepare": "npm run build",
     "lint": "tslint -p . -t verbose",
-    "test": "npm run lint && TS_NODE_FILES=true mocha --config test/.mocharc.json --files --reporter spec $NODE_DEBUG_OPTION"
+    "test": "npm run lint && TS_NODE_FILES=true mocha --config test/.mocharc.json $NODE_DEBUG_OPTION"
   },
   "repository": {
     "type": "git",
