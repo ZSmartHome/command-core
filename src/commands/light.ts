@@ -47,17 +47,24 @@ interface Option extends OptionLike<Executor<Yeelight.Light>> {
 }
 
 const decorate = (executor: Executor<Yeelight.Light>, save = true): ExecuteFunc<Yeelight.Light> => async (): Promise<Yeelight.Light> => {
-  const lamp = await connectLamp();
-
-  let promise = executor(lamp);
-  promise = save ? promise.then((it) => it.set_default()) : promise;
-  // TODO: Test finally and move on Node 10 and higher
-  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/finally
-  // return promise.finally(() => lamp.exit());
+  let lamp: Yeelight.Light | undefined;
   try {
+    lamp = await connectLamp();
+
+    let promise = executor(lamp);
+    promise = save ? promise.then((it) => it.set_default()) : promise;
+    // TODO: Test finally and move on Node 10 and higher
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/finally
+    // return promise.finally(() => lamp.exit());
     return await promise;
+  } catch (e) {
+    throw new ExecutionError(`Failed to execute command: ${e.message || e}`);
   } finally {
-    lamp.exit();
+    if (lamp) {
+      console.log(`Closing connection to lamp...`);
+      lamp.exit();
+      console.log(`Connection to lamp closed`);
+    }
   }
 }
 
