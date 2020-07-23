@@ -1,5 +1,5 @@
 import {ExecutionError} from '..';
-import Yeelight from 'yeelight2';
+import * as Yeelight from 'yeelight2';
 
 interface Option {
   [command: string]: (light: Yeelight.Light) => Promise<any>;
@@ -59,8 +59,17 @@ export const Option: Option = {
 
 export type Value = keyof Option;
 
+// BC! TS doesn't support built-in extending like in spec es6
+class MyString extends String {
+  isEmpty() {
+    return this.trim().length === 0;
+  }
+}
+
 export const execute = async (command: Value): Promise<string> => {
-  if (!command) {
+  const myCommand = (new MyString(String(command).trim()));
+  const isEmpty = myCommand.isEmpty();
+  if (isEmpty) {
     throw new ExecutionError(`What should I do with Light?`);
   }
   const action = Option[command];
