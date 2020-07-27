@@ -33,7 +33,9 @@ const reset = (lamp: Yeelight.Light) => Promise.all([
 
 const LAMP_TIMEOUT = 2000;
 const connectLamp = () => new Promise<Yeelight.Light>((success, fail) => {
-  const timer = setTimeout(() => fail(new ExecutionError(`Couldn't find lamp in ${LAMP_TIMEOUT}ms`)), LAMP_TIMEOUT);
+  const timer = setTimeout(() =>
+      fail(new ExecutionError(`Couldn't find lamp in ${LAMP_TIMEOUT}ms`)),
+    LAMP_TIMEOUT);
   Yeelight.discover(function (myLight) {
     this.close();
     clearTimeout(timer);
