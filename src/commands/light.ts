@@ -53,7 +53,7 @@ const decorate = (executor: Executor<Yeelight.Light>, save = true): ExecuteFunc<
   try {
     lamp = await connectLamp();
 
-    let promise = executor(lamp);
+    let promise = executor(lamp).then(() => lamp!!);
     promise = save ? promise.then((it) => it.set_default()) : promise;
     // TODO: Test finally and move on Node 10 and higher
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/finally
