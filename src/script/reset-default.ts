@@ -1,4 +1,4 @@
-import {light} from '../src';
+import {light} from '../';
 
 light(`default`)
   .catch((e) => console.error(e))

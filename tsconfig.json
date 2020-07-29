@@ -57,7 +57,6 @@
   },
   "include": [
     "./src",
-    "./@types",
-    "./script"
+    "./@types"
   ]
 }
