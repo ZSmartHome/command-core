@@ -8,6 +8,7 @@
     "build": "tsc",
     "prepare": "npm run clean && npm run build",
     "lint": "tslint -p . -t verbose",
+    "changelog": "npx changelog-maker >> changelog.md",
     "test": "npm run lint && jest -c ./test/jest.config.json"
   },
   "repository": {
