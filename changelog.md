@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.5.0
+
+* [[`cd7db88203`](https://github.com/ZSmartHome/command-core/commit/cd7db88203)] - add badges (Evgenii Shchepotev)
+
 ## Version 0.4.7
 
 * [[`e87c917e6b`](https://github.com/ZSmartHome/command-core/commit/e87c917e6b)] - add publish script (Evgenii Shchepotev)
