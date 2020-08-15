@@ -1,6 +1,7 @@
 import {ExecutionError} from '..';
 import * as Yeelight from 'yeelight2';
-import {Command, ExecuteFunc, Executor, OptionLike, run, toCommands} from './option';
+import {Option} from '../executor/option';
+import Executor from '../executor/executor';
 
 // https://en.wikipedia.org/wiki/Color_temperature
 const TEMPERATURE = {
@@ -44,46 +45,49 @@ const connectLamp = () => new Promise<Yeelight.Light>((success, fail) => {
 });
 
 
-interface Option extends OptionLike<Executor<Yeelight.Light>> {
+interface LightOption extends Option {
+  action: (light: Yeelight.Light) => Promise<Yeelight.Light>
   doNotSave?: boolean
 }
 
-const decorate = (executor: Executor<Yeelight.Light>, save = true): ExecuteFunc<Yeelight.Light> => async (): Promise<Yeelight.Light> => {
-  let lamp: Yeelight.Light | undefined;
-  try {
-    lamp = await connectLamp();
+class LightExecutor extends Executor<LightOption, Yeelight.Light> {
+  constructor() {
+    super(`Light`, {
+        on: {label: `On 💡`, doNotSave: true, action: (it) => it.set_power(`on`)},
+        off: {label: `Off 💡`, doNotSave: true, action: (it) => it.set_power(`off`)},
+        bright: {label: `Bright ☀️`, action: (it) => it.set_bright(75)},
+        normal: {label: `Питер 🌤️`, action: (it) => it.set_bright(50)},
+        dark: {label: `Dark ☁️`, action: (it) => it.set_bright(30)},
+        red: {label: `🔴`, action: (it) => it.set_rgb(0xFF0000)},
+        blue: {label: `🔵`, action: (it) => it.set_rgb(0x0000FF)},
+        green: {label: `🟢`, action: (it) => it.set_rgb(0x00FF00)},
+        default: {label: `Комнатный 💡`, action: reset}
+      }
+    )
+  }
 
-    let promise = executor(lamp).then(() => lamp!!);
-    promise = save ? promise.then((it) => it.set_default()) : promise;
-    // TODO: Test finally and move on Node 10 and higher
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/finally
-    // return promise.finally(() => lamp.exit());
-    return await promise;
-  } catch (e) {
-    throw new ExecutionError(`Failed to execute command: ${e.message || e}`);
-  } finally {
-    if (lamp) {
-      console.log(`Closing connection to lamp...`);
-      lamp.exit();
-      console.log(`Connection to lamp closed`);
+  protected async execute(option: LightOption): Promise<Yeelight.Light> {
+    let lamp: Yeelight.Light | undefined;
+    try {
+      lamp = await connectLamp();
+
+      let promise = option.action(lamp).then(() => lamp!!);
+      promise = !option.doNotSave ? promise.then((it) => it.set_default()) : promise;
+      // TODO: Test finally and move on Node 10 and higher
+      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/finally
+      // return promise.finally(() => lamp.exit());
+      return await promise;
+    } catch (e) {
+      throw new ExecutionError(`Failed to execute command: ${e.message || e}`);
+    } finally {
+      if (lamp) {
+        console.log(`Closing connection to lamp...`);
+        lamp.exit();
+        console.log(`Connection to lamp closed`);
+      }
     }
   }
+
 }
 
-
-export const commands: { [command: string]: Command<Yeelight.Light> } = toCommands<Yeelight.Light, Executor<Yeelight.Light>, Option>({
-  on: {label: `On 💡`, doNotSave: true, value: (it) => it.set_power(`on`)},
-  off: {label: `Off 💡`, doNotSave: true, value: (it) => it.set_power(`off`)},
-  bright: {label: `Bright ☀️`, value: (it) => it.set_bright(75)},
-  normal: {label: `Питер 🌤️`, value: (it) => it.set_bright(50)},
-  dark: {label: `Dark ☁️`, value: (it) => it.set_bright(30)},
-  red: {label: `🔴`, value: (it) => it.set_rgb(0xFF0000)},
-  blue: {label: `🔵`, value: (it) => it.set_rgb(0x0000FF)},
-  green: {label: `🟢`, value: (it) => it.set_rgb(0x00FF00)},
-  default: {label: `Комнатный 💡`, value: reset}
-}, (option) => decorate(option.value, !option.doNotSave));
-
-
-export type CommandKey = keyof typeof commands;
-
-export const execute = async (command: CommandKey): Promise<Yeelight.Light> => run(`Light`, commands, command);
+export const getExecutor = () => new LightExecutor();
