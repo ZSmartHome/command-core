@@ -34,4 +34,4 @@ export class TVExecutor extends Executor<StringOption, string> {
   }
 }
 
-export const getExecutor = () => new TVExecutor();
+export const getExecutor = (): TVExecutor => new TVExecutor();

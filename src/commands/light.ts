@@ -50,7 +50,7 @@ interface LightOption extends Option {
   doNotSave?: boolean
 }
 
-class LightExecutor extends Executor<LightOption, Yeelight.Light> {
+export class LightExecutor extends Executor<LightOption, Yeelight.Light> {
   constructor() {
     super(`Light`, {
         on: {label: `On 💡`, doNotSave: true, action: (it) => it.set_power(`on`)},
@@ -90,4 +90,4 @@ class LightExecutor extends Executor<LightOption, Yeelight.Light> {
 
 }
 
-export const getExecutor = () => new LightExecutor();
+export const getExecutor = ():LightExecutor => new LightExecutor();
