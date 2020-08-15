@@ -11,7 +11,7 @@ export class CameraExecutor extends Executor<Option, Stream> {
     });
   }
 
-  protected async execute(option: Option): Promise<Stream> {
+  protected async execute(_: Option): Promise<Stream> {
     return new Promise((resolve, reject) => {
       get(this.url, (response) => {
         const statusCode = response.statusCode;
@@ -21,9 +21,11 @@ export class CameraExecutor extends Executor<Option, Stream> {
         // @ts-ignore
         response.path = `camera.jpg`; // NB! Due to issue in library check set this always
         resolve(response);
-      })
+      }).on(`error`, (e) => {
+        reject(new ExecutionError(`Requested failed: ${e.message}`));
+      });
     })
   }
 }
 
-export const getExecutor = (url) => new CameraExecutor(url);
+export const getExecutor = (url:string) => new CameraExecutor(url);

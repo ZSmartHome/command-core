@@ -9,5 +9,6 @@ export const lightExecutor = getLightExecutor()
 export const light = lightExecutor.run.bind(lightExecutor)
 export const lightCommands = lightExecutor.commands
 
+export {getExecutor as getCameraExecutor} from './commands/camera';
 export {ExecutionError} from './errors/execution-error';
 export {shell, split} from './util';
