@@ -80,7 +80,7 @@ export const commands: { [command: string]: Command<Yeelight.Light> } = toComman
   red: {label: `🔴`, value: (it) => it.set_rgb(0xFF0000)},
   blue: {label: `🔵`, value: (it) => it.set_rgb(0x0000FF)},
   green: {label: `🟢`, value: (it) => it.set_rgb(0x00FF00)},
-  default: {label: `Комнатный 💡`, value: reset}
+  default: {label: `💡`, value: reset}
 }, (option) => decorate(option.value, !option.doNotSave));
 
 
