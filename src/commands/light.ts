@@ -61,7 +61,7 @@ export class LightExecutor extends Executor<LightOption, Yeelight.Light> {
         red: {label: `🔴`, action: (it) => it.set_rgb(0xFF0000)},
         blue: {label: `🔵`, action: (it) => it.set_rgb(0x0000FF)},
         green: {label: `🟢`, action: (it) => it.set_rgb(0x00FF00)},
-        default: {label: `Комнатный 💡`, action: reset}
+        default: {label: `💡`, action: reset}
       }
     )
   }
