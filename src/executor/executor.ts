@@ -38,5 +38,5 @@ export default abstract class Executor<T extends Option, V> {
     return this.execute(myCommand);
   }
 
-  protected abstract async execute(option: T): Promise<V>;
+  protected abstract execute(option: T): Promise<V>;
 }

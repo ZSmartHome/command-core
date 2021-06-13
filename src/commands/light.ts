@@ -1,5 +1,5 @@
 import {ExecutionError} from '..';
-import * as Yeelight from 'yeelight2';
+import Yeelight from 'yeelight2';
 import {Option} from '../executor/option';
 import Executor from '../executor/executor';
 
