@@ -1,5 +1,16 @@
 # Changelog
 
+## Version 0.7.1
+
+* [[`e4be1bacf6`](https://github.com/ZSmartHome/command-core/commit/e4be1bacf6)] - fix compilation errors (Evgenii Shchepotev)
+* [[`7730f6c406`](https://github.com/ZSmartHome/command-core/commit/7730f6c406)] - skip libcheck (Evgenii Shchepotev)
+* [[`e411de1131`](https://github.com/ZSmartHome/command-core/commit/e411de1131)] - update versions (Evgenii Shchepotev)
+* [[`2004ec0a80`](https://github.com/ZSmartHome/command-core/commit/2004ec0a80)] - update lock (Evgenii Shchepotev)
+* [[`e4be1bacf6`](https://github.com/ZSmartHome/command-core/commit/e4be1bacf6)] - fix compilation errors (Evgenii Shchepotev)
+* [[`7730f6c406`](https://github.com/ZSmartHome/command-core/commit/7730f6c406)] - skip libcheck (Evgenii Shchepotev)
+* [[`e411de1131`](https://github.com/ZSmartHome/command-core/commit/e411de1131)] - update versions (Evgenii Shchepotev)
+
+
 ## Version 0.5.0
 
 * [[`cd7db88203`](https://github.com/ZSmartHome/command-core/commit/cd7db88203)] - add badges (Evgenii Shchepotev)
